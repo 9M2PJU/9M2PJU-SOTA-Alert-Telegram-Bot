@@ -30,6 +30,8 @@ SOTA_ALERTS_POLL_SECONDS="300"
 
 ## Docker
 
+The image uses `python:3.12-alpine`, which is small and supports Raspberry Pi ARM builds.
+
 ```bash
 docker compose up -d --build
 docker compose logs -f sota-bot
