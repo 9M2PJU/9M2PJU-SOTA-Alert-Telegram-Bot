@@ -4,6 +4,8 @@
 
 `9M2PJU SOTA Bot` is a Telegram bot for SOTA chasers and activators. It follows SOTAwatch spots and alerts, then delivers useful updates to Telegram users who subscribe to the bot.
 
+Use the bot on Telegram: [@PJUSOTA_bot](https://t.me/PJUSOTA_bot)
+
 ## What Is SOTA?
 
 Summits on the Air, commonly known as SOTA, is an amateur radio award programme that encourages portable operation from mountain summits. Activators hike or travel to qualified summits and operate radio from the field, while chasers contact them from home stations, portable stations, or other summits.
@@ -59,7 +61,8 @@ flowchart LR
 - `/spots` - show latest matching spots.
 - `/alerts` - show upcoming matching alerts.
 - `/filter` - show active filters.
-- `/filter association 9M` - follow one SOTA association prefix.
+- `/filter 9M2` - follow one SOTA association prefix.
+- `/filter 9M6` - follow one SOTA association prefix.
 - `/filter callsign 9M2PJU` - follow a callsign.
 - `/filter mode CW` - follow a mode.
 - `/clearfilters` - remove all filters.

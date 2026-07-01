@@ -8,6 +8,7 @@ from telegram.constants import ParseMode
 from telegram.error import TelegramError
 from telegram.ext import Application, CommandHandler, ContextTypes
 
+from .commands import parse_filter_args
 from .config import load_settings
 from .filters import alert_matches, spot_matches
 from .formatting import format_alert, format_spot, help_text
@@ -79,11 +80,11 @@ class SotaBot:
             subscriber = self.store.get_subscriber(chat_id)
             await update.message.reply_text("Current filters:\n" + describe_filters(subscriber))
             return
-        if len(args) < 2:
-            await update.message.reply_text("Usage: /filter association 9M, /filter callsign 9M2PJU, or /filter mode CW")
+        parsed = parse_filter_args(args)
+        if parsed is None:
+            await update.message.reply_text("Usage: /filter 9M2, /filter callsign 9M2PJU, or /filter mode CW")
             return
-        key = args[0].lower()
-        value = " ".join(args[1:])
+        key, value = parsed
         try:
             subscriber = self.store.set_filter(chat_id, key, value)
         except ValueError as exc:
