@@ -1,0 +1,12 @@
+services:
+  sota-bot:
+    build: .
+    container_name: 9m2pju-sota-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - sota-bot-data:/app/data
+
+volumes:
+  sota-bot-data:
