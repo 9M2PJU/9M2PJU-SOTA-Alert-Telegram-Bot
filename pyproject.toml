@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Telegram bot that forwards SOTAwatch spots and alerts to subscribed users."
 readme = "README.md"
 requires-python = ">=3.11"
+license = "GPL-3.0-or-later"
 dependencies = [
     "python-telegram-bot>=21.0,<23.0",
 ]

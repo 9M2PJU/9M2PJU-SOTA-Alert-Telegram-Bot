@@ -87,3 +87,7 @@ Filters are matched case-insensitively. Association filters match SOTA associati
 ## Project Notes
 
 The bot is designed to be small, readable, and reliable. It keeps user preferences local, treats SOTAwatch as the source of truth, and uses Telegram only for interaction and delivery.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 or later. See [LICENSE](LICENSE) for details.
