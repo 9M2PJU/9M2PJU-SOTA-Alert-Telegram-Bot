@@ -43,8 +43,7 @@ class SotaBot:
     async def unsubscribe(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if update.effective_chat is None or update.message is None:
             return
-        self.store.set_active(update.effective_chat.id, False)
-        subscriber = self.store.get_subscriber(update.effective_chat.id)
+        subscriber = self.store.unsubscribe(update.effective_chat.id)
         await update.message.reply_text("Unsubscribed from all notifications.\n" + describe_subscription(subscriber))
 
     async def spots_on(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

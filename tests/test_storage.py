@@ -38,6 +38,17 @@ class StoreTests(unittest.TestCase):
             self.assertTrue(subscriber.notify_spots)
             self.assertFalse(subscriber.notify_alerts)
 
+    def test_unsubscribe_stops_spots_and_alerts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(f"{tmp}/bot.sqlite3")
+            store.set_notifications(123, notify_spots=True, notify_alerts=True)
+
+            subscriber = store.unsubscribe(123)
+
+            self.assertFalse(subscriber.is_active)
+            self.assertFalse(subscriber.notify_spots)
+            self.assertFalse(subscriber.notify_alerts)
+
 
 if __name__ == "__main__":
     unittest.main()

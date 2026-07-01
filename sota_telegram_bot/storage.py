@@ -75,6 +75,20 @@ class Store:
     def set_active(self, chat_id: int, active: bool) -> None:
         self.upsert_subscriber(chat_id, active=active)
 
+    def unsubscribe(self, chat_id: int) -> Subscriber:
+        self.upsert_subscriber(chat_id, active=False)
+        with closing(self.connect()) as conn:
+            conn.execute(
+                """
+                UPDATE subscribers
+                SET is_active = 0, notify_spots = 0, notify_alerts = 0
+                WHERE chat_id = ?
+                """,
+                (chat_id,),
+            )
+            conn.commit()
+        return self.get_subscriber(chat_id)
+
     def set_notifications(
         self,
         chat_id: int,
