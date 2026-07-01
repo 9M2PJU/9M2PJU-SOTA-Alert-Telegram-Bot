@@ -67,10 +67,19 @@ class FilterTests(unittest.TestCase):
 
     def test_inactive_subscriber_does_not_match(self) -> None:
         self.assertFalse(spot_matches(self.subscriber(is_active=False), self.spot()))
+        self.assertTrue(spot_matches(self.subscriber(is_active=False), self.spot(), require_notifications=False))
+
+    def test_spot_notification_switch(self) -> None:
+        self.assertFalse(spot_matches(self.subscriber(notify_spots=False), self.spot()))
+        self.assertTrue(spot_matches(self.subscriber(notify_spots=False), self.spot(), require_notifications=False))
 
     def test_alert_matches_frequency_mode(self) -> None:
         self.assertTrue(alert_matches(self.subscriber(mode_filter="fm"), self.alert()))
         self.assertFalse(alert_matches(self.subscriber(mode_filter="cw"), self.alert()))
+
+    def test_alert_notification_switch(self) -> None:
+        self.assertFalse(alert_matches(self.subscriber(notify_alerts=False), self.alert()))
+        self.assertTrue(alert_matches(self.subscriber(notify_alerts=False), self.alert(), require_notifications=False))
 
 
 if __name__ == "__main__":

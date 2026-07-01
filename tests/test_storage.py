@@ -22,6 +22,22 @@ class StoreTests(unittest.TestCase):
             self.assertFalse(store.mark_sent(123, "spot", 1))
             self.assertTrue(store.mark_sent(123, "alert", 1))
 
+    def test_notification_switches_round_trip(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(f"{tmp}/bot.sqlite3")
+            subscriber = store.set_notifications(123, notify_spots=False)
+            self.assertFalse(subscriber.notify_spots)
+            self.assertTrue(subscriber.notify_alerts)
+            self.assertTrue(subscriber.is_active)
+
+            subscriber = store.set_notifications(123, notify_alerts=False)
+            self.assertFalse(subscriber.notify_spots)
+            self.assertFalse(subscriber.notify_alerts)
+
+            subscriber = store.set_notifications(123, notify_spots=True)
+            self.assertTrue(subscriber.notify_spots)
+            self.assertFalse(subscriber.notify_alerts)
+
 
 if __name__ == "__main__":
     unittest.main()

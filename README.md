@@ -51,7 +51,11 @@ flowchart LR
 - `/start` - subscribe and show help.
 - `/help` - show command help.
 - `/subscribe` - enable notifications.
-- `/unsubscribe` - stop notifications.
+- `/unsubscribe` - stop all notifications.
+- `/spots_on` - enable spot notifications.
+- `/spots_off` - disable spot notifications.
+- `/alerts_on` - enable alert notifications.
+- `/alerts_off` - disable alert notifications.
 - `/spots` - show latest matching spots.
 - `/alerts` - show upcoming matching alerts.
 - `/filter` - show active filters.

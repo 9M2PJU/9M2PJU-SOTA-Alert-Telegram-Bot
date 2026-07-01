@@ -12,7 +12,7 @@ from .config import load_settings
 from .filters import alert_matches, spot_matches
 from .formatting import format_alert, format_spot, help_text
 from .sotawatch import SotawatchClient, SotawatchError
-from .storage import Store, describe_filters
+from .storage import Store, describe_filters, describe_subscription
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,13 +36,39 @@ class SotaBot:
         if update.effective_chat is None or update.message is None:
             return
         self.store.set_active(update.effective_chat.id, True)
-        await update.message.reply_text("Subscribed. I will send matching SOTA spots and alerts.")
+        subscriber = self.store.set_notifications(update.effective_chat.id, notify_spots=True, notify_alerts=True)
+        await update.message.reply_text("Subscribed.\n" + describe_subscription(subscriber))
 
     async def unsubscribe(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if update.effective_chat is None or update.message is None:
             return
         self.store.set_active(update.effective_chat.id, False)
-        await update.message.reply_text("Unsubscribed. Use /subscribe to enable notifications again.")
+        subscriber = self.store.get_subscriber(update.effective_chat.id)
+        await update.message.reply_text("Unsubscribed from all notifications.\n" + describe_subscription(subscriber))
+
+    async def spots_on(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        if update.effective_chat is None or update.message is None:
+            return
+        subscriber = self.store.set_notifications(update.effective_chat.id, notify_spots=True)
+        await update.message.reply_text("Spot notifications enabled.\n" + describe_subscription(subscriber))
+
+    async def spots_off(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        if update.effective_chat is None or update.message is None:
+            return
+        subscriber = self.store.set_notifications(update.effective_chat.id, notify_spots=False)
+        await update.message.reply_text("Spot notifications disabled.\n" + describe_subscription(subscriber))
+
+    async def alerts_on(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        if update.effective_chat is None or update.message is None:
+            return
+        subscriber = self.store.set_notifications(update.effective_chat.id, notify_alerts=True)
+        await update.message.reply_text("Alert notifications enabled.\n" + describe_subscription(subscriber))
+
+    async def alerts_off(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        if update.effective_chat is None or update.message is None:
+            return
+        subscriber = self.store.set_notifications(update.effective_chat.id, notify_alerts=False)
+        await update.message.reply_text("Alert notifications disabled.\n" + describe_subscription(subscriber))
 
     async def filter(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if update.effective_chat is None or update.message is None:
@@ -81,7 +107,7 @@ class SotaBot:
             LOGGER.warning("spots lookup failed: %s", exc)
             await update.message.reply_text("Could not fetch SOTAwatch spots right now.")
             return
-        matches = [spot for spot in spots if spot_matches(subscriber, spot)][:5]
+        matches = [spot for spot in spots if spot_matches(subscriber, spot, require_notifications=False)][:5]
         if not matches:
             await update.message.reply_text("No matching spots found.")
             return
@@ -98,7 +124,7 @@ class SotaBot:
             LOGGER.warning("alerts lookup failed: %s", exc)
             await update.message.reply_text("Could not fetch SOTAwatch alerts right now.")
             return
-        matches = [alert for alert in alerts if alert_matches(subscriber, alert)][:5]
+        matches = [alert for alert in alerts if alert_matches(subscriber, alert, require_notifications=False)][:5]
         if not matches:
             await update.message.reply_text("No matching alerts found.")
             return
@@ -185,6 +211,10 @@ def build_application() -> Application:
     application.add_handler(CommandHandler("help", sota_bot.help))
     application.add_handler(CommandHandler("subscribe", sota_bot.subscribe))
     application.add_handler(CommandHandler("unsubscribe", sota_bot.unsubscribe))
+    application.add_handler(CommandHandler("spots_on", sota_bot.spots_on))
+    application.add_handler(CommandHandler("spots_off", sota_bot.spots_off))
+    application.add_handler(CommandHandler("alerts_on", sota_bot.alerts_on))
+    application.add_handler(CommandHandler("alerts_off", sota_bot.alerts_off))
     application.add_handler(CommandHandler("filter", sota_bot.filter))
     application.add_handler(CommandHandler("clearfilters", sota_bot.clearfilters))
     application.add_handler(CommandHandler("spots", sota_bot.spots))

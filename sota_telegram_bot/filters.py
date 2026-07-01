@@ -21,8 +21,8 @@ def _matches_contains(filter_value: str, *candidates: str) -> bool:
     return any(expected in _norm(candidate) for candidate in candidates)
 
 
-def spot_matches(subscriber: Subscriber, spot: Spot) -> bool:
-    if not subscriber.is_active or not subscriber.notify_spots:
+def spot_matches(subscriber: Subscriber, spot: Spot, *, require_notifications: bool = True) -> bool:
+    if require_notifications and (not subscriber.is_active or not subscriber.notify_spots):
         return False
     return (
         _matches_prefix(subscriber.association_filter, spot.association_code)
@@ -31,8 +31,8 @@ def spot_matches(subscriber: Subscriber, spot: Spot) -> bool:
     )
 
 
-def alert_matches(subscriber: Subscriber, alert: Alert) -> bool:
-    if not subscriber.is_active or not subscriber.notify_alerts:
+def alert_matches(subscriber: Subscriber, alert: Alert, *, require_notifications: bool = True) -> bool:
+    if require_notifications and (not subscriber.is_active or not subscriber.notify_alerts):
         return False
     return (
         _matches_prefix(subscriber.association_filter, alert.association_code)

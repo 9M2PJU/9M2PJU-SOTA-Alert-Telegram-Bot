@@ -75,6 +75,29 @@ class Store:
     def set_active(self, chat_id: int, active: bool) -> None:
         self.upsert_subscriber(chat_id, active=active)
 
+    def set_notifications(
+        self,
+        chat_id: int,
+        *,
+        notify_spots: bool | None = None,
+        notify_alerts: bool | None = None,
+    ) -> Subscriber:
+        self.upsert_subscriber(chat_id)
+        updates = []
+        values: list[int] = []
+        if notify_spots is not None:
+            updates.append("notify_spots = ?")
+            values.append(int(notify_spots))
+        if notify_alerts is not None:
+            updates.append("notify_alerts = ?")
+            values.append(int(notify_alerts))
+        if updates:
+            values.append(chat_id)
+            with closing(self.connect()) as conn:
+                conn.execute(f"UPDATE subscribers SET {', '.join(updates)}, is_active = 1 WHERE chat_id = ?", values)
+                conn.commit()
+        return self.get_subscriber(chat_id)
+
     def set_filter(self, chat_id: int, key: str, value: str) -> Subscriber:
         columns = {
             "association": "association_filter",
@@ -154,3 +177,10 @@ def describe_filters(subscriber: Subscriber) -> str:
         "mode": data["mode_filter"] or "any",
     }
     return "\n".join(f"{key}: {value}" for key, value in filters.items())
+
+
+def describe_subscription(subscriber: Subscriber) -> str:
+    active = "on" if subscriber.is_active else "off"
+    spots = "on" if subscriber.notify_spots else "off"
+    alerts = "on" if subscriber.notify_alerts else "off"
+    return f"subscription: {active}\nspots: {spots}\nalerts: {alerts}"
